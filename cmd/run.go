@@ -46,15 +46,31 @@ func init() {
 	runCmd.PersistentFlags().String("http.idle_timeout", "60s", "http server write timeout")
 	runCmd.PersistentFlags().String("http.shutdown_timeout", "60s", "http server write timeout")
 
+	viper.BindPFlag("http.addr", runCmd.PersistentFlags().Lookup("http.addr"))
+	viper.BindPFlag("http.read_timeout", runCmd.PersistentFlags().Lookup("http.read_timeout"))
+	viper.BindPFlag("http.write_timeout", runCmd.PersistentFlags().Lookup("http.write_timeout"))
+	viper.BindPFlag("http.idle_timeout", runCmd.PersistentFlags().Lookup("http.idle_timeout"))
+	viper.BindPFlag("http.shutdown_timeout", runCmd.PersistentFlags().Lookup("http.shutdown_timeout"))
+
 	runCmd.PersistentFlags().String("sqlite.path", "./fee.db", "sqlite db path")
 
+	viper.BindPFlag("sqlite.path", runCmd.PersistentFlags().Lookup("sqlite.path"))
+
 	runCmd.PersistentFlags().String("statistics.interval", "60s", "sqlite db path")
+
+	viper.BindPFlag("statistics.interval", runCmd.PersistentFlags().Lookup("statistics.interval"))
 
 	runCmd.PersistentFlags().Int("sync.block", 19548652, "sync start block")
 	runCmd.PersistentFlags().String("sync.address", "0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2", "sync contract address block")
 	runCmd.PersistentFlags().String("sync.topic1", "0xd1ec3a1216f08b6eff72e169ceb548b782db18a6614852618d86bb19f3f9b0d3", "sync topic 1 ")
 	runCmd.PersistentFlags().String("sync.topic2", "0x0000000000000000000000000000000000000000000000000000000000000003", "sync topic 2")
 	runCmd.PersistentFlags().String("sync.rpc_url", "https://rpc.ankr.com/eth", "rpc address")
+
+	viper.BindPFlag("sync.block", runCmd.PersistentFlags().Lookup("sync.block"))
+	viper.BindPFlag("sync.address", runCmd.PersistentFlags().Lookup("sync.address"))
+	viper.BindPFlag("sync.topic1", runCmd.PersistentFlags().Lookup("sync.topic1"))
+	viper.BindPFlag("sync.topic2", runCmd.PersistentFlags().Lookup("sync.topic2"))
+	viper.BindPFlag("sync.rpc_url", runCmd.PersistentFlags().Lookup("sync.rpc_url"))
 }
 
 func run() {

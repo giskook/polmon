@@ -8,11 +8,16 @@ import (
 	"github.com/giskook/polmon/internal/persistence"
 )
 
+const (
+	blockRange = 100
+)
+
 type Synchronizer struct {
-	Conf   Configure
-	Client *ethclient.Client
-	Store  persistence.Persistence
-	exit   chan struct{}
+	Conf       Configure
+	Client     *ethclient.Client
+	Store      persistence.Persistence
+	exit       chan struct{}
+	beginBlock uint64
 }
 
 func NewSynchronizer(conf Configure, store persistence.Persistence) *Synchronizer {
@@ -21,10 +26,11 @@ func NewSynchronizer(conf Configure, store persistence.Persistence) *Synchronize
 		log.Fatal("NewSynchronizer ethclient.Dial: ", err)
 	}
 	return &Synchronizer{
-		Conf:   conf,
-		Client: client,
-		Store:  store,
-		exit:   make(chan struct{}),
+		Conf:       conf,
+		Client:     client,
+		Store:      store,
+		beginBlock: conf.Block,
+		exit:       make(chan struct{}),
 	}
 }
 
@@ -46,19 +52,20 @@ func (s *Synchronizer) Stop() {
 	close(s.exit)
 }
 
-func (s *Synchronizer) getBeginBlock() uint64 {
-	block, err := s.Store.GetLatestPersistedBlock()
+func (s *Synchronizer) getBeginBlock(beginBlock uint64) uint64 {
+	dbBlock, err := s.Store.GetLatestPersistedBlock()
 	if err != nil {
-		block = 0
+		dbBlock = 0
 	}
-	return max(s.Conf.Block, block+1) // 1 for next block
+
+	return max(beginBlock, dbBlock+1) // 1 for next block
 }
 
 func (s *Synchronizer) store() error {
-	beginBlock := s.getBeginBlock()
+	beginBlock := s.getBeginBlock(s.beginBlock)
 	ctx := context.Background()
-	logs, err := s.scanBlockRange(ctx, beginBlock, 100)
-	log.Println("syncing block: ", beginBlock, " to ", beginBlock+100)
+	logs, err := s.scanBlockRange(ctx, beginBlock, blockRange)
+	log.Println("syncing block: ", beginBlock, " to ", beginBlock+blockRange)
 	if err != nil {
 		return err
 	}
@@ -71,5 +78,6 @@ func (s *Synchronizer) store() error {
 			return err
 		}
 	}
+	s.beginBlock += blockRange + 1
 	return nil
 }

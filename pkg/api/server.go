@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	v1 "github.com/giskook/polmon/pkg/api/v1"
 	"github.com/gorilla/mux"
 )
 
@@ -14,15 +13,17 @@ const (
 )
 
 type HttpServer struct {
-	conf   Configure
-	router *mux.Router
-	srv    *http.Server
+	conf    Configure
+	router  *mux.Router
+	srv     *http.Server
+	handler Handler
 }
 
-func NewServer(conf Configure) *HttpServer {
+func NewServer(conf Configure, handler Handler) *HttpServer {
 	return &HttpServer{
-		conf:   conf,
-		router: mux.NewRouter(),
+		conf:    conf,
+		router:  mux.NewRouter(),
+		handler: handler,
 	}
 }
 
@@ -50,7 +51,7 @@ func (h *HttpServer) Start() {
 
 func (h *HttpServer) initApiV1(r *mux.Router) {
 	s := r.PathPrefix("/v1").Subrouter()
-	s.HandleFunc("/fee", v1.Fee).Methods("GET")
+	s.HandleFunc("/fee", h.handler.Fee).Methods("GET")
 }
 
 func (h *HttpServer) Stop() {

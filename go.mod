@@ -7,6 +7,8 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
+	gorm.io/driver/sqlite v1.5.5
+	gorm.io/gorm v1.25.9
 )
 
 require (
@@ -26,7 +28,10 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect

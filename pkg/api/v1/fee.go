@@ -2,22 +2,31 @@ package v1
 
 import "net/http"
 
-func Fee(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Fee(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if x := recover(); x != nil {
 			commonReply(w, http.StatusInternalServerError, "500000", nil, nil)
 		}
 	}()
 
-	var http_status int
-	var internal_status string
+	var httpStatus int
+	var internalStatus string
 	var err error
 	var data interface{}
 
 	switch r.Method {
 	case http.MethodGet:
-		// http_status, internal_status, data, err = get(w, r)
+		fee, err := h.GetTotalFee()
+		if err != nil {
+			httpStatus = http.StatusInternalServerError
+			internalStatus = "500001"
+			data = nil
+		} else {
+			httpStatus = http.StatusOK
+			internalStatus = "200000"
+			data = fee
+		}
 	}
 
-	commonReply(w, http_status, internal_status, data, err)
+	commonReply(w, httpStatus, internalStatus, data, err)
 }

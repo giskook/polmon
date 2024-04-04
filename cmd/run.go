@@ -4,7 +4,12 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/giskook/polmon/internal/persistence/sqlite"
+	"github.com/giskook/polmon/internal/statistics"
+	"github.com/giskook/polmon/internal/sync"
 	"github.com/giskook/polmon/pkg/api"
+	v1 "github.com/giskook/polmon/pkg/api/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,7 +31,6 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -36,23 +40,49 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	runCmd.PersistentFlags().Int("sync.block", 0, "sync start block")
-	runCmd.PersistentFlags().Int("sync.topic", 0, "sync start block")
-
-	runCmd.PersistentFlags().String("http.addr", "", "http server addr")
+	runCmd.PersistentFlags().String("http.addr", "0.0.0.0:8080", "http server addr")
 	runCmd.PersistentFlags().String("http.read_timeout", "60s", "http server read timeout")
 	runCmd.PersistentFlags().String("http.write_timeout", "60s", "http server write timeout")
 	runCmd.PersistentFlags().String("http.idle_timeout", "60s", "http server write timeout")
-	runCmd.PersistentFlags().String("http.shudown_timeout", "60s", "http server write timeout")
+	runCmd.PersistentFlags().String("http.shutdown_timeout", "60s", "http server write timeout")
+
+	runCmd.PersistentFlags().String("sqlite.path", "./fee.db", "sqlite db path")
+
+	runCmd.PersistentFlags().String("statistics.interval", "60s", "sqlite db path")
+
+	runCmd.PersistentFlags().Int("sync.block", 19548652, "sync start block")
+	runCmd.PersistentFlags().String("sync.address", "0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2", "sync contract address block")
+	runCmd.PersistentFlags().String("sync.topic1", "0xd1ec3a1216f08b6eff72e169ceb548b782db18a6614852618d86bb19f3f9b0d3", "sync topic 1 ")
+	runCmd.PersistentFlags().String("sync.topic2", "0x0000000000000000000000000000000000000000000000000000000000000003", "sync topic 2")
+	runCmd.PersistentFlags().String("sync.rpc_url", "https://rpc.ankr.com/eth", "rpc address")
 }
 
 func run() {
+	store := sqlite.NewPersistence(sqlite.Configure{Path: viper.GetString("sqlite.path")})
+	handler := v1.NewHandlerV1(store)
 	httpServer := api.NewServer(api.Configure{
 		Addr:            viper.GetString("http.addr"),
 		WriteTimeout:    viper.GetDuration("http.write_timeout"),
 		ReadTimeout:     viper.GetDuration("http.read_timeout"),
 		IdleTimeout:     viper.GetDuration("http.idle_timeout"),
-		ShutdownTimeout: viper.GetDuration("http.shudown_timeout"),
-	})
+		ShutdownTimeout: viper.GetDuration("http.shutdown_timeout"),
+	}, handler)
 	httpServer.Start()
+	defer httpServer.Stop()
+
+	statistics := statistics.NewStatistics(statistics.Configure{
+		Internal: viper.GetDuration("statistics.interval"),
+	}, store)
+	go statistics.Start()
+	defer statistics.Stop()
+
+	sync := sync.NewSynchronizer(sync.Configure{
+		RpcURL:  viper.GetString("sync.rpc_url"),
+		Block:   viper.GetUint64("sync.block"),
+		Address: common.HexToAddress(viper.GetString("sync.address")),
+		Topic1:  common.HexToHash(viper.GetString("sync.topic1")),
+		Topic2:  common.HexToHash(viper.GetString("sync.topic2")),
+	}, store)
+	sync.Start()
+	defer sync.Stop()
 }

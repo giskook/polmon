@@ -11,7 +11,7 @@ import (
 func TestSynchronizer_scanBlockRange(t *testing.T) {
 	const blockNumber = 19580368
 	conf := Configure{
-		RpcURL:  "https://mainnet.infura.io/v3/0d081e04621c4c69b12649fbb63ef18a",
+		RpcURL:  "https://rpc.ankr.com/eth",
 		Block:   blockNumber,
 		Address: common.HexToAddress("0x5132A183E9F3CB7C848b0AAC5Ae0c4f0491B7aB2"),
 		Topic1:  common.HexToHash("0xd1ec3a1216f08b6eff72e169ceb548b782db18a6614852618d86bb19f3f9b0d3"),

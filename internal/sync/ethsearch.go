@@ -13,15 +13,17 @@ const (
 	blockFinalized = 64
 )
 
-func (s *Synchronizer) scanBlockRange(ctx context.Context, from, limit uint64) ([]types.Log, error) {
+func (s *Synchronizer) scanBlockRange(ctx context.Context, from, limit uint64) ([]types.Log, bool, error) {
+	pause := false
 	latestBlockNumber, err := s.Client.BlockNumber(ctx)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	latestBlockNumber -= blockFinalized
 	to := from + limit
 	if to > latestBlockNumber {
 		to = latestBlockNumber
+		pause = true
 	}
 
 	filterQuery := ethereum.FilterQuery{
@@ -33,7 +35,8 @@ func (s *Synchronizer) scanBlockRange(ctx context.Context, from, limit uint64) (
 	filterQuery.Topics = append(filterQuery.Topics, []common.Hash{s.Conf.Topic1})
 	filterQuery.Topics = append(filterQuery.Topics, []common.Hash{s.Conf.Topic2})
 
-	return s.Client.FilterLogs(ctx, filterQuery)
+	ret, err := s.Client.FilterLogs(ctx, filterQuery)
+	return ret, pause, err
 }
 
 func (s *Synchronizer) calcFee(ctx context.Context, txHash common.Hash) (uint64, error) {

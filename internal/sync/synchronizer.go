@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/giskook/polmon/internal/persistence"
@@ -64,7 +65,7 @@ func (s *Synchronizer) getBeginBlock(beginBlock uint64) uint64 {
 func (s *Synchronizer) store() error {
 	beginBlock := s.getBeginBlock(s.beginBlock)
 	ctx := context.Background()
-	logs, err := s.scanBlockRange(ctx, beginBlock, blockRange)
+	logs, pause, err := s.scanBlockRange(ctx, beginBlock, blockRange)
 	log.Println("syncing block: ", beginBlock, " to ", beginBlock+blockRange)
 	if err != nil {
 		return err
@@ -79,5 +80,9 @@ func (s *Synchronizer) store() error {
 		}
 	}
 	s.beginBlock += blockRange + 1
+	if pause {
+		time.Sleep(5 * time.Minute)
+	}
+
 	return nil
 }

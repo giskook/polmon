@@ -48,5 +48,5 @@ func (s *Synchronizer) calcFee(ctx context.Context, txHash common.Hash) (uint64,
 	tx, _, err := s.Client.TransactionByHash(ctx, txHash)
 	gasPrice := tx.GasPrice()
 
-	return gasPrice.Mul(gasPrice, new(big.Int).SetUint64(gasUsed)).Uint64(), nil
+	return new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(gasUsed)).Uint64(), nil
 }

@@ -18,7 +18,7 @@ func (p *Persistence) SaveSync(blockNum uint64, txHash string, fee uint64) error
 
 func (p *Persistence) GetLatestPersistedBlock() (uint64, error) {
 	var syncedBlock Sync
-	p.db.Last(&syncedBlock, 1)
+	p.db.Last(&syncedBlock, nil)
 
 	return syncedBlock.BlockNum, nil
 }

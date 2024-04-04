@@ -14,5 +14,5 @@ type Persistence interface {
 	GetTotalFee() (string, error)
 
 	// SaveStatistics saves the block number, transaction hash and fee to statistics table
-	SaveStatistics(blockNum uint64, txHash string, fee string) error
+	SaveStatistics(blockNum uint64, txHash string, fee uint64, total string) error
 }

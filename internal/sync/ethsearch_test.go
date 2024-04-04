@@ -22,7 +22,7 @@ func TestSynchronizer_scanBlockRange(t *testing.T) {
 	synchronizer.Start()
 	ctx := context.Background()
 
-	hash, err := synchronizer.scanBlockRange(ctx, blockNumber, 1)
+	hash, _, err := synchronizer.scanBlockRange(ctx, blockNumber, 1)
 	if err != nil {
 		t.Log(err)
 	} else {

@@ -64,6 +64,7 @@ func (s *Synchronizer) getBeginBlock(beginBlock uint64) uint64 {
 
 func (s *Synchronizer) store() error {
 	beginBlock := s.getBeginBlock(s.beginBlock)
+	s.beginBlock = beginBlock
 	ctx := context.Background()
 	logs, pause, err := s.scanBlockRange(ctx, beginBlock, blockRange)
 	log.Println("syncing block: ", beginBlock, " to ", beginBlock+blockRange)

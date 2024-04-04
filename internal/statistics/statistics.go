@@ -46,10 +46,13 @@ func (s *Statistics) Start() {
 				log.Info("statistics GetTotalFee ", "err", err)
 				continue
 			}
-			totalFeeInt, _ := new(big.Int).SetString(totalFee, 10)
+			totalFeeInt := new(big.Int).SetUint64(0)
+			if totalFee != "" {
+				totalFeeInt, _ = new(big.Int).SetString(totalFee, 10)
+			}
 			feeInt := new(big.Int).SetUint64(fee)
 			totalFeeInt.Add(totalFeeInt, feeInt)
-			s.persistence.SaveStatistics(unStatisticsBlock, txHash, totalFeeInt.String())
+			s.persistence.SaveStatistics(unStatisticsBlock, txHash, fee, totalFeeInt.String())
 		}
 	}
 }

@@ -56,7 +56,7 @@ func init() {
 
 	viper.BindPFlag("sqlite.path", runCmd.PersistentFlags().Lookup("sqlite.path"))
 
-	runCmd.PersistentFlags().String("statistics.interval", "60s", "sqlite db path")
+	runCmd.PersistentFlags().String("statistics.interval", "10s", "sqlite db path")
 
 	viper.BindPFlag("statistics.interval", runCmd.PersistentFlags().Lookup("statistics.interval"))
 

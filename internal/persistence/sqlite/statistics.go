@@ -6,24 +6,25 @@ type Statistics struct {
 	gorm.Model
 	BlockNum uint64
 	TxHash   string
-	Fee      string
+	Fee      uint64
+	Total    string
 }
 
 func (p *Persistence) GetLatestStatisticsBlock() (uint64, error) {
 	var statistics Statistics
-	p.db.Last(&statistics, 1)
+	p.db.Last(&statistics, nil)
 
 	return statistics.BlockNum, nil
 }
 
 func (p *Persistence) GetTotalFee() (string, error) {
 	var statistics Statistics
-	p.db.Last(&statistics, 1)
+	p.db.Last(&statistics, nil)
 
-	return statistics.Fee, nil
+	return statistics.Total, nil
 }
 
-func (p *Persistence) SaveStatistics(blockNum uint64, txHash string, fee string) error {
-	p.db.Create(&Statistics{BlockNum: blockNum, TxHash: txHash, Fee: fee})
+func (p *Persistence) SaveStatistics(blockNum uint64, txHash string, fee uint64, total string) error {
+	p.db.Create(&Statistics{BlockNum: blockNum, TxHash: txHash, Fee: fee, Total: total})
 	return nil
 }

@@ -38,7 +38,7 @@ func (s *Statistics) Start() {
 			if err != nil {
 				log.Error("statistics GetUnStatisticsBlock ", "err", err)
 			}
-			if latestStatisticsBlock == unStatisticsBlock {
+			if latestStatisticsBlock == unStatisticsBlock || unStatisticsBlock == 0 {
 				continue
 			}
 			totalFee, err := s.persistence.GetTotalFee()

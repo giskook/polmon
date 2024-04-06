@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Statistics struct {
 	gorm.Model
-	BlockNum uint64
+	BlockNum uint64 `gorm:"uniqueIndex"`
 	TxHash   string
 	Fee      uint64
 	Total    string

@@ -3,6 +3,7 @@ package sqlite
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Persistence struct {
@@ -11,7 +12,9 @@ type Persistence struct {
 }
 
 func NewPersistence(conf Configure) *Persistence {
-	db, err := gorm.Open(sqlite.Open(conf.Path), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(conf.Path), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
